@@ -1,0 +1,11 @@
+Model Information:
+* title:	Bond Forger from [SPY × FAMILY]
+* source:	https://sketchfab.com/3d-models/bond-forger-from-spy-family-481783da76df4e419132062b77c1527b
+* author:	WON (https://sketchfab.com/won1)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Bond Forger from [SPY × FAMILY]" (https://sketchfab.com/3d-models/bond-forger-from-spy-family-481783da76df4e419132062b77c1527b) by WON (https://sketchfab.com/won1) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

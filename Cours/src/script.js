@@ -1,8 +1,10 @@
 import * as THREE from "../node_modules/three/build/three.module.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import TWEEN from "@tweenjs/tween.js"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 
 const scene = new THREE.Scene()
+const loader = new GLTFLoader()
+//const gltfPath = "/assets/bond_forger_from_spy__family/scene.gltf"
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -58,28 +60,34 @@ function createSun() {
 // createSun();
 
 // Create a planet
-function createPlanet(radius, texturePath, distance, speed, orbitAngle, name) {
-  const planetGeometry = new THREE.SphereGeometry(radius, 32, 32) // Adjust the size of the planet
-  // Load the texture
+function createPlanet(
+  radius,
+  texturePath,
+  distance,
+  speed,
+  orbitAngle,
+  name,
+  gltfPath
+) {
+  const segments = 32
+  const planetGeometry = new THREE.SphereGeometry(radius, 32, 32)
   const textureLoader = new THREE.TextureLoader()
   const texture = textureLoader.load(texturePath)
-
-  // Create the material with the texture
   const planetMaterial = new THREE.MeshBasicMaterial({
     map: texture,
   })
   const planet = new THREE.Mesh(planetGeometry, planetMaterial)
   planet.position.set(
     distance * Math.cos(orbitAngle),
-    distance * Math.sin(orbitAngle)
-  ) // Set the position of the planet (x, y, z)
+    distance * Math.sin(orbitAngle),
+    0
+  )
   scene.add(planet)
 
   function rgba(r, g, b, a) {
     return `rgb(${r}, ${g}, ${b}, ${a})`
   }
 
-  // Create the orbit path as a line
   const orbitPathRadius = distance
   const orbitPathGeometry = new THREE.BufferGeometry()
   const orbitPathMaterial = new THREE.LineBasicMaterial({
@@ -87,13 +95,12 @@ function createPlanet(radius, texturePath, distance, speed, orbitAngle, name) {
   })
   const orbitPathPoints = []
 
-  // Add points on the orbit path that pass through the planet
-  const numPoints = 360 // Adjust the number of points for a smoother circle
+  const numPoints = 360
   for (let i = 0; i < numPoints; i++) {
     const angle = (i / numPoints) * Math.PI * 2
     const x = orbitPathRadius * Math.cos(angle)
     const y = orbitPathRadius * Math.sin(angle)
-    const z = 0 // Adjust the Z position as needed
+    const z = 0
     orbitPathPoints.push(x, y, z)
   }
 
@@ -104,20 +111,37 @@ function createPlanet(radius, texturePath, distance, speed, orbitAngle, name) {
   const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial)
   scene.add(orbitPath)
 
-  // Add rotation animation to the planet
   planet.animate = function (delta) {
-    const angle = speed * delta // Calculate the rotation angle based on the speed and delta time
-    planet.rotation.y += angle // Apply the rotation
+    const angle = speed * delta
+    planet.rotation.y += angle
 
     planet.position.set(
       distance * Math.cos(orbitAngle),
-      distance * Math.sin(orbitAngle)
-    ) // Update the position in the circular orbit
-    orbitAngle += angle // Update the orbit angle
+      distance * Math.sin(orbitAngle),
+      0
+    )
+    orbitAngle += angle
+  }
+
+  if (gltfPath) {
+    const loader = new THREE.GLTFLoader()
+    loader.load(gltfPath, function (gltf) {
+      const model = gltf.scene
+      // Effectuez les opérations nécessaires pour placer et dimensionner le modèle
+
+      // Ajoutez le modèle à la scène
+      scene.add(model)
+    })
+  } else {
+    const geometry = new THREE.SphereGeometry(radius, segments, segments)
+    const material = new THREE.MeshBasicMaterial({
+      map: new THREE.TextureLoader().load(texturePath),
+    })
+    const planetMesh = new THREE.Mesh(geometry, material)
+    scene.add(planetMesh)
   }
 
   planet.name = name
-
   return planet
 }
 
@@ -125,19 +149,6 @@ function createPlanet(radius, texturePath, distance, speed, orbitAngle, name) {
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true // Enable smooth camera movement
 controls.dampingFactor = 0.05 // Adjust damping factor as per your preference
-
-function animate() {
-  requestAnimationFrame(animate)
-
-  const delta = clock.getDelta() // Get the time difference since the last frame
-
-  // Animate each planet
-  planets.forEach((planet) => {
-    planet.animate(delta)
-  })
-
-  renderer.render(scene, camera)
-}
 
 // Update renderer and camera on window resize
 window.addEventListener("resize", () => {
@@ -153,19 +164,68 @@ function rgb(r, g, b) {
 }
 
 const planets = [
-  createPlanet(0.7, "textures/mercure.jpg", 7, 0.47, 0, "Mercure"), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(1.8, "textures/venus.jpg", 10, 0.35, Math.PI / 4, "Venus"), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(1.9, "textures/earth.jpg", 13, 0.29, Math.PI / 2, "Terre"), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-  createPlanet(1.1, "textures/mars.jpg", 20, 0.24, Math.PI / 6, "Mars"), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(15, "textures/jupiter.jpg", 42, 0.13, Math.PI / 9, "Jupiter"), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(11, "textures/saturn.jpg", 69, 0.09, Math.PI, "Saturne"), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createPlanet(
+    0.7,
+    "textures/mercure.jpg",
+    7,
+    0.47,
+    0,
+    "Mercure",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createPlanet(
+    1.8,
+    "textures/venus.jpg",
+    10,
+    0.35,
+    Math.PI / 4,
+    "Venus",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createPlanet(
+    1.9,
+    "textures/earth.jpg",
+    13,
+    0.29,
+    Math.PI / 2,
+    "Terre",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createPlanet(
+    1.1,
+    "textures/mars.jpg",
+    20,
+    0.24,
+    Math.PI / 6,
+    "Mars",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createPlanet(
+    15,
+    "textures/jupiter.jpg",
+    42,
+    0.13,
+    Math.PI / 9,
+    "Jupiter",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createPlanet(
+    11,
+    "textures/saturn.jpg",
+    69,
+    0.09,
+    Math.PI,
+    "Saturne",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
+  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
   createPlanet(
     7.5,
     "textures/uranus.jpg",
     127,
     0.06,
     (3 * Math.PI) / 4,
-    "Uranus"
+    "Uranus",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
   ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
   createPlanet(
     7.5,
@@ -173,7 +233,8 @@ const planets = [
     256,
     0.05,
     (5 * Math.PI) / 6,
-    "Neptune"
+    "Neptune",
+    "/assets/bond_forger_from_spy__family/scene.gltf"
   ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
 ]
 
@@ -203,7 +264,7 @@ function onClick(event) {
 
     // Zoom
 
-    //console.log(object)
+    console.log(object)
     //camera.position.set(object.position)
 
     // modifier le centre de ma scene
@@ -211,4 +272,18 @@ function onClick(event) {
     // lerp / gsap
   }
 }
+
+function animate() {
+  requestAnimationFrame(animate)
+
+  const delta = clock.getDelta() // Get the time difference since the last frame
+
+  // Animate each planet
+  planets.forEach((planet) => {
+    planet.animate(delta)
+  })
+
+  renderer.render(scene, camera)
+}
+
 animate()
