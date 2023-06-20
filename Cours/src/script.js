@@ -220,42 +220,53 @@ function onClick(event) {
         return; // Ignore the click event if dragging occurred
       }
   
-    if (intersects.length > 0) {
-      const object = intersects[0].object;
-      console.log(`Planet clicked: ${object.name}`);
-  
-      // Zoom
-      const targetPosition = object.position.clone();
-      const distanceFromPlanet = object.geometry.parameters.radius * 4;
-      console.log(distanceFromPlanet);
-      const cameraPosition = targetPosition.clone().normalize().multiplyScalar(distanceFromPlanet);
-      const tweenDuration = 1000;
-  
-      new TWEEN.Tween(camera.position)
-        .to(cameraPosition, tweenDuration)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .start();
-  
-      // Stop rotation
-      planets.forEach((planet) => {
-        planet.isRotating = false;
-      });
-    } else {
-      // Unzoom
-      const zoomOutPosition = new THREE.Vector3(0, 0, 200); // Adjust the unzoomed camera position
-      const tweenDuration = 1000;
-  
-      new TWEEN.Tween(camera.position)
-        .to(zoomOutPosition, tweenDuration)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .onComplete(() => {
-          // Make planets rotate again
-          planets.forEach((planet) => {
-            planet.isRotating = true;
-          });
-        })
-        .start();
-    }
+      // Declare a flag to track the zoom state
+      if (intersects.length > 0) {
+        const object = intersects[0].object;
+        console.log(`Planet clicked: ${object.name}`);
+      
+        // Zoom
+        const targetPosition = object.position.clone();
+        const distanceFromPlanet = object.geometry.parameters.radius * 4;
+        const cameraPosition = targetPosition.clone().add(new THREE.Vector3(0, 0, distanceFromPlanet));
+        const tweenDuration = 1000;
+      
+        new TWEEN.Tween(camera.position)
+          .to(cameraPosition, tweenDuration)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .start();
+      
+        new TWEEN.Tween(camera.lookAt)
+          .to(targetPosition, tweenDuration)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .start();
+      
+        // Stop rotation
+        planets.forEach((planet) => {
+          planet.isRotating = false;
+        });
+      } else {
+        // Unzoom
+        const zoomOutPosition = new THREE.Vector3(0, 0, 200); // Adjust the unzoomed camera position
+        const tweenDuration = 1000;
+      
+        new TWEEN.Tween(camera.position)
+          .to(zoomOutPosition, tweenDuration)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .onComplete(() => {
+            // Make planets rotate again
+            planets.forEach((planet) => {
+              planet.isRotating = true;
+            });
+          })
+          .start();
+      
+        new TWEEN.Tween(camera.lookAt)
+          .to(new THREE.Vector3(0, 0, 0), tweenDuration)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .start();
+      }
+
   }
   
   
