@@ -143,14 +143,14 @@ function rgb(r, g, b) {
 }
 
 const planets = [
-    createPlanet(0.7, 'textures/mercure.jpg', 7, 0.1, 0), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-    createPlanet(1.8, 'textures/venus.jpg', 10, 0.015, Math.PI / 4), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-    createPlanet(1.9, 'textures/earth.jpg', 13, 0.09, Math.PI / 2), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-    createPlanet(1.1, 'textures/mars.jpg', 20, 0.04, Math.PI / 6), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-    createPlanet(15, 'textures/jupiter.jpg', 42, 0.07, Math.PI / 9), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-    createPlanet(11, 'textures/saturn.jpg', 69, 0.01, Math.PI), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-    createPlanet(7.5, 'textures/uranus.jpg', 127, 0.02, (3 * Math.PI) / 4), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-    createPlanet(7.5, 'textures/neptune.jpg', 256, 0.08, (5 * Math.PI) / 6), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+    createPlanet(0.7, 'textures/mercure.jpg', 7, 0.47, 0), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+    createPlanet(1.8, 'textures/venus.jpg', 10, 0.35, Math.PI / 4), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+    createPlanet(1.9, 'textures/earth.jpg', 13, 0.29, Math.PI / 2), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+    createPlanet(1.1, 'textures/mars.jpg', 20, 0.24, Math.PI / 6), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+    createPlanet(15, 'textures/jupiter.jpg', 42, 0.13, Math.PI / 9), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+    createPlanet(11, 'textures/saturn.jpg', 69, 0.09, Math.PI), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+    createPlanet(7.5, 'textures/uranus.jpg', 127, 0.06, (3 * Math.PI) / 4), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+    createPlanet(7.5, 'textures/neptune.jpg', 256, 0.05, (5 * Math.PI) / 6), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
 ];
 
 const clock = new THREE.Clock(); //
