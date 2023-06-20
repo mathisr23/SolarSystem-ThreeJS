@@ -1,6 +1,7 @@
 import * as THREE from "../node_modules/three/build/three.module.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 
 const scene = new THREE.Scene()
 const loader = new GLTFLoader()
@@ -71,12 +72,13 @@ function createPlanet(
 ) {
   const segments = 32
   const planetGeometry = new THREE.SphereGeometry(radius, 32, 32)
-  const textureLoader = new THREE.TextureLoader()
-  const texture = textureLoader.load(texturePath)
-  const planetMaterial = new THREE.MeshBasicMaterial({
-    map: texture,
-  })
-  const planet = new THREE.Mesh(planetGeometry, planetMaterial)
+  //const textureLoader = new THREE.TextureLoader()
+  //const texture = textureLoader.load(texturePath)
+  //const planetMaterial = new THREE.MeshBasicMaterial({
+  //  map: texture,
+  //})
+
+  const planet = new THREE.Mesh(planetGeometry) // , planetMaterial)
   planet.position.set(
     distance * Math.cos(orbitAngle),
     distance * Math.sin(orbitAngle),
@@ -123,23 +125,35 @@ function createPlanet(
     orbitAngle += angle
   }
 
-  if (gltfPath) {
-    const loader = new THREE.GLTFLoader()
-    loader.load(gltfPath, function (gltf) {
-      const model = gltf.scene
-      // Effectuez les opérations nécessaires pour placer et dimensionner le modèle
+  const loader = new GLTFLoader()
 
-      // Ajoutez le modèle à la scène
-      scene.add(model)
-    })
-  } else {
-    const geometry = new THREE.SphereGeometry(radius, segments, segments)
-    const material = new THREE.MeshBasicMaterial({
-      map: new THREE.TextureLoader().load(texturePath),
-    })
-    const planetMesh = new THREE.Mesh(geometry, material)
-    scene.add(planetMesh)
-  }
+  // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+  const dracoLoader = new DRACOLoader()
+  loader.setDRACOLoader(dracoLoader)
+
+  // Load a glTF resource
+  loader.load(
+    // resource URL
+    gltfPath,
+    // called when the resource is loaded
+    function (gltf) {
+      scene.add(gltf.scene)
+
+      gltf.animations // Array<THREE.AnimationClip>
+      gltf.scene // THREE.Group
+      gltf.scenes // Array<THREE.Group>
+      gltf.cameras // Array<THREE.Camera>
+      gltf.asset // Object
+    },
+    // called while loading is progressing
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total) * 100 + "% loaded")
+    },
+    // called when loading has errors
+    function (error) {
+      console.log("An error happened")
+    }
+  )
 
   planet.name = name
   return planet
@@ -171,7 +185,7 @@ const planets = [
     0.47,
     0,
     "Mercure",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
+    "assets/bond_forger_from_spy__family/scene.gltf"
   ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
   createPlanet(
     1.8,
