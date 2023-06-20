@@ -219,11 +219,23 @@ function onClick(event) {
     if (isDragging) {
         return; // Ignore the click event if dragging occurred
       }
+
+      // Get the text container element
+  const textContainer = document.getElementById('text-container');
+
+        // Clear previous text content
+  textContainer.innerHTML = '';
   
       // Declare a flag to track the zoom state
       if (intersects.length > 0) {
         const object = intersects[0].object;
         console.log(`Planet clicked: ${object.name}`);
+
+           // Display planet information
+    const planetInfo = document.createElement('p');
+    planetInfo.textContent = `Planet: ${object.name}`;
+    planetInfo.textContent = `LA GROSSE DARONNE A HUGO PROUT PROUT PROUT`;
+    textContainer.appendChild(planetInfo);
       
         // Zoom
         const targetPosition = object.position.clone();
