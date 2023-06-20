@@ -296,6 +296,7 @@ function animate() {
   planets.forEach((planet) => {
     planet.animate(delta)
   })
+  // scene.children[numeroDeLenfant]
 
   renderer.render(scene, camera)
 }
