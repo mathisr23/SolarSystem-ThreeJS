@@ -2,6 +2,7 @@ import * as THREE from "../node_modules/three/build/three.module.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
+import TWEEN from "@tweenjs/tween.js"
 
 const scene = new THREE.Scene()
 const loader = new GLTFLoader()
@@ -18,7 +19,9 @@ const dogsArray = []
 
 // Create renderer object and specify its size
 const canvas = document.querySelector(".webgl")
-const renderer = new THREE.WebGLRenderer({ canvas: canvas })
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+})
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
@@ -184,10 +187,6 @@ window.addEventListener("resize", () => {
 
 const sun = createSun()
 
-function rgb(r, g, b) {
-  return `rgb(${r}, ${g}, ${b})`
-}
-
 const dogs = [
   createPlanet(
     1, //Scale
@@ -288,6 +287,8 @@ function animate() {
       dog.animate(delta)
     }
   })
+
+  TWEEN.update()
 
   renderer.render(scene, camera)
 }
