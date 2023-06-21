@@ -131,13 +131,25 @@ function createPlanet(
   const dracoLoader = new DRACOLoader()
   loader.setDRACOLoader(dracoLoader)
 
+  var dog = null
   // Load a glTF resource
   loader.load(
     // resource URL
     gltfPath,
     // called when the resource is loaded
     function (gltf) {
-      scene.add(gltf.scene)
+      dog = gltf.scene
+      scene.add(dog)
+
+      dog.name = "firstDog"
+      // positionner sur l'anneau
+      dog.position.set(
+        distance * Math.cos(orbitAngle),
+        distance * Math.sin(orbitAngle),
+        0
+      )
+
+      processLoadedModel(dog)
 
       gltf.animations // Array<THREE.AnimationClip>
       gltf.scene // THREE.Group
@@ -154,6 +166,8 @@ function createPlanet(
       console.log("An error happened")
     }
   )
+
+  console.log(scene.children)
 
   planet.name = name
   return planet
