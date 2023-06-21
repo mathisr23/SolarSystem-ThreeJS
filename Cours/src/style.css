@@ -1,0 +1,28 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: 'Astronova';
+    src: url('../fonts/astronova.ttf') format('truetype'); /* Adjust the path and file format if needed */
+  }
+  
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#title {
+    position: absolute;
+    top: 50px;
+    font-family: Arial, sans-serif;
+    font-size: 32px;
+    color: white;
+    font-family: 'Astronova', Arial, sans-serif;
+  }
+  
