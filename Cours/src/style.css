@@ -28,10 +28,32 @@
 
 #text-container{
     position: absolute;
-    top: 30%;
-    left: 5%;
+    top: 20%;
+    left: 65%;
     color: white;
     font-size: 32px;
-
 }
+
+.paragraph{
+  color: rebeccapurple;
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 1;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.fade-out.hide {
+  opacity: 0;
+}
+
   
