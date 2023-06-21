@@ -62,8 +62,8 @@ function createSun() {
   return sun
 }
 
-// Create a planet
-function createPlanet(
+// Create a dog
+function createdog(
   scale,
   texturePath,
   distance,
@@ -144,7 +144,7 @@ function createPlanet(
         }
       })
 
-      // Add rotation animation to the planet
+      // Add rotation animation to the dog
       dog.animate = function (delta) {
         const angle = speed * delta // Calculate the rotation angle based on the speed and delta time
         dog.rotation.y += angle // Apply the rotation
@@ -188,7 +188,7 @@ window.addEventListener("resize", () => {
 const sun = createSun()
 
 const dogs = [
-  createPlanet(
+  createdog(
     1, //Scale
     "textures/mercure.jpg",
     7,
@@ -196,8 +196,8 @@ const dogs = [
     0,
     "Mercure", // Name
     "assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
     1,
     "textures/earth.jpg",
     10,
@@ -205,8 +205,8 @@ const dogs = [
     Math.PI / 4,
     "Venus",
     "/assets/dog/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createdog(
     3,
     "textures/earth.jpg",
     13,
@@ -214,8 +214,8 @@ const dogs = [
     Math.PI / 2,
     "Terre",
     "/assets/balloon_dog/scene.gltf"
-  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-  createPlanet(
+  ), // dog 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createdog(
     4,
     "textures/mars.jpg",
     20,
@@ -223,8 +223,8 @@ const dogs = [
     Math.PI / 6,
     "Mars",
     "/assets/dog_skate/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
     5,
     "textures/jupiter.jpg",
     42,
@@ -232,8 +232,8 @@ const dogs = [
     Math.PI / 9,
     "Jupiter",
     "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createdog(
     6,
     "textures/saturn.jpg",
     69,
@@ -241,8 +241,8 @@ const dogs = [
     Math.PI,
     "Saturne",
     "/assets/dog/scene.gltf"
-  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-  createPlanet(
+  ), // dog 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createdog(
     15,
     "textures/uranus.jpg",
     127,
@@ -250,8 +250,8 @@ const dogs = [
     (3 * Math.PI) / 4,
     "Uranus",
     "/assets/dog/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
     30,
     "/assets/zombie_dog/textures/M_Wasteland_hound_normal.jpeg",
     256,
@@ -259,7 +259,7 @@ const dogs = [
     (5 * Math.PI) / 6,
     "Neptune",
     "/assets/dog/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
 ]
 
 const clock = new THREE.Clock() //
@@ -268,7 +268,98 @@ const clock = new THREE.Clock() //
 const raycaster = new THREE.Raycaster()
 const mouse = new THREE.Vector2()
 
-console.log(dogsArray)
+// Eventlistener (onClick)
+canvas.addEventListener("click", onClick)
+
+let isDragging = false // Track dragging state
+
+function onMouseDown(event) {
+  isDragging = false
+}
+
+function onMouseMove(event) {
+  isDragging = true
+}
+
+canvas.addEventListener("mousedown", onMouseDown, false)
+canvas.addEventListener("mousemove", onMouseMove, false)
+
+function onClick(event) {
+  const rect = canvas.getBoundingClientRect()
+  const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+  const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+  mouse.x = x
+  mouse.y = y
+
+  raycaster.setFromCamera(mouse, camera)
+
+  const intersects = raycaster.intersectObjects(dogsArray, true)
+
+  if (isDragging) {
+    return // Ignore the click event if dragging occurred
+  }
+
+  // Get the text container element
+  const textContainer = document.getElementById("text-container")
+
+  // Clear previous text content
+  textContainer.innerHTML = ""
+
+  // Declare a flag to track the zoom state
+  if (intersects.length > 0) {
+    const object = intersects[0].object
+    console.log(`dog clicked: ${object.name}`)
+
+    // Display dog information
+    const dogInfo = document.createElement("p")
+    dogInfo.textContent = `dog: ${object.name}`
+    dogInfo.textContent = `LA GROSSE DARONNE A HUGO PROUT PROUT PROUT`
+    textContainer.appendChild(dogInfo)
+
+    // Zoom
+    const targetPosition = object.position.clone()
+    const distanceFromdog = object.geometry.parameters.radius * 4
+    const cameraPosition = targetPosition
+      .clone()
+      .add(new THREE.Vector3(0, 0, distanceFromdog))
+    const tweenDuration = 1000
+
+    new TWEEN.Tween(camera.position)
+      .to(cameraPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
+
+    new TWEEN.Tween(camera.lookAt)
+      .to(targetPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
+
+    // Stop rotation
+    dogsArray.forEach((dog) => {
+      dog.isRotating = false
+    })
+  } else {
+    // Unzoom
+    const zoomOutPosition = new THREE.Vector3(0, 0, 200) // Adjust the unzoomed camera position
+    const tweenDuration = 1000
+
+    new TWEEN.Tween(camera.position)
+      .to(zoomOutPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onComplete(() => {
+        // Make dogsArray rotate again
+        dogsArray.forEach((dog) => {
+          dog.isRotating = true
+        })
+      })
+      .start()
+
+    new TWEEN.Tween(camera.lookAt)
+      .to(new THREE.Vector3(0, 0, 0), tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
+  }
+}
 
 function animate() {
   requestAnimationFrame(animate)
