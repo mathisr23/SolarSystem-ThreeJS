@@ -58,11 +58,9 @@ function createSun() {
   return sun
 }
 
-// createSun();
-
 // Create a planet
 function createPlanet(
-  radius,
+  scale,
   texturePath,
   distance,
   speed,
@@ -119,7 +117,7 @@ function createPlanet(
     // called when the resource is loaded
     function (gltf) {
       dog = gltf.scene
-      dog.scale.set(2, 2, 2)
+      dog.scale.set(scale, scale, scale)
 
       dog.isRotating = true
       scene.add(dog)
@@ -175,18 +173,18 @@ function rgb(r, g, b) {
   return `rgb(${r}, ${g}, ${b})`
 }
 
-const planets = [
+const dogs = [
   createPlanet(
-    1,
+    1, //Scale
     "textures/mercure.jpg",
     7,
     0.47,
     0,
-    "Mercure",
+    "Mercure", // Name
     "assets/bond_forger_from_spy__family/scene.gltf"
   ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
   createPlanet(
-    10.1,
+    1,
     "textures/earth.jpg",
     10,
     0.35,
@@ -195,7 +193,7 @@ const planets = [
     "/assets/dog/scene.gltf"
   ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
   createPlanet(
-    1.9,
+    3,
     "textures/earth.jpg",
     13,
     0.29,
@@ -204,7 +202,7 @@ const planets = [
     "/assets/balloon_dog/scene.gltf"
   ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
   createPlanet(
-    1.1,
+    4,
     "textures/mars.jpg",
     20,
     0.24,
@@ -213,7 +211,7 @@ const planets = [
     "/assets/dog_skate/scene.gltf"
   ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
   createPlanet(
-    15,
+    5,
     "textures/jupiter.jpg",
     42,
     0.13,
@@ -222,7 +220,7 @@ const planets = [
     "/assets/bond_forger_from_spy__family/scene.gltf"
   ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
   createPlanet(
-    11,
+    6,
     "textures/saturn.jpg",
     69,
     0.09,
@@ -231,7 +229,7 @@ const planets = [
     "/assets/dog/scene.gltf"
   ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
   createPlanet(
-    7.5,
+    15,
     "textures/uranus.jpg",
     127,
     0.06,
@@ -240,13 +238,13 @@ const planets = [
     "/assets/dog/scene.gltf"
   ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
   createPlanet(
-    7.5,
+    30,
     "/assets/zombie_dog/textures/M_Wasteland_hound_normal.jpeg",
     256,
     0.05,
     (5 * Math.PI) / 6,
     "Neptune",
-    "/assets/zombie_dog/scene.gltf"
+    "/assets/dog/scene.gltf"
   ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
 ]
 
@@ -265,9 +263,9 @@ function animate() {
 
   // scene.children[numeroDeLenfant]
 
-  const dogs = scene.children[20009]
-  if (dogs) {
-    dogs.rotation.y += 0.1
+  const dog = scene.children[20009]
+  if (dog) {
+    dog.rotation.y += 0.1
   }
 
   //if (dogs.isRotating) {
