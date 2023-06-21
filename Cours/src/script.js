@@ -5,7 +5,6 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
 
 const scene = new THREE.Scene()
 const loader = new GLTFLoader()
-//const gltfPath = "/assets/bond_forger_from_spy__family/scene.gltf"
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -14,6 +13,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 )
 camera.position.z = 30
+
+const dogsArray = []
 
 // Create renderer object and specify its size
 const canvas = document.querySelector(".webgl")
@@ -119,6 +120,8 @@ function createPlanet(
       dog = gltf.scene
       dog.scale.set(scale, scale, scale)
 
+      dogsArray.push(dog)
+
       dog.isRotating = true
       scene.add(dog)
 
@@ -137,6 +140,18 @@ function createPlanet(
           child.material.map = texture
         }
       })
+
+      // Add rotation animation to the planet
+      dog.animate = function (delta) {
+        const angle = speed * delta // Calculate the rotation angle based on the speed and delta time
+        dog.rotation.y += angle // Apply the rotation
+
+        dog.position.set(
+          distance * Math.cos(orbitAngle),
+          distance * Math.sin(orbitAngle)
+        ) // Update the position in the circular orbit
+        orbitAngle += angle // Update the orbit angle
+      }
 
       gltf.animations // Array<THREE.AnimationClip>
       gltf.scene // THREE.Group
@@ -254,7 +269,7 @@ const clock = new THREE.Clock() //
 const raycaster = new THREE.Raycaster()
 const mouse = new THREE.Vector2()
 
-console.log(scene)
+console.log(dogsArray)
 
 function animate() {
   requestAnimationFrame(animate)
@@ -268,9 +283,11 @@ function animate() {
     dog.rotation.y += 0.1
   }
 
-  //if (dogs.isRotating) {
-  //  dogs.animate(delta)
-  //}
+  dogsArray.forEach((dog) => {
+    if (dog.isRotating) {
+      dog.animate(delta)
+    }
+  })
 
   renderer.render(scene, camera)
 }
