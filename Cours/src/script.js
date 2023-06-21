@@ -2,10 +2,10 @@ import * as THREE from "../node_modules/three/build/three.module.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js"
+import TWEEN from "@tweenjs/tween.js"
 
 const scene = new THREE.Scene()
 const loader = new GLTFLoader()
-//const gltfPath = "/assets/bond_forger_from_spy__family/scene.gltf"
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -15,9 +15,13 @@ const camera = new THREE.PerspectiveCamera(
 )
 camera.position.z = 30
 
+const dogsArray = []
+
 // Create renderer object and specify its size
 const canvas = document.querySelector(".webgl")
-const renderer = new THREE.WebGLRenderer({ canvas: canvas })
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+})
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
@@ -58,11 +62,9 @@ function createSun() {
   return sun
 }
 
-// createSun();
-
-// Create a planet
-function createPlanet(
-  radius,
+// Create a dog
+function createdog(
+  scale,
   texturePath,
   distance,
   speed,
@@ -71,20 +73,12 @@ function createPlanet(
   gltfPath
 ) {
   const segments = 32
-  const planetGeometry = new THREE.SphereGeometry(radius, 32, 32)
-  //const textureLoader = new THREE.TextureLoader()
-  //const texture = textureLoader.load(texturePath)
-  //const planetMaterial = new THREE.MeshBasicMaterial({
-  //  map: texture,
-  //})
 
-  const planet = new THREE.Mesh(planetGeometry) // , planetMaterial)
-  planet.position.set(
-    distance * Math.cos(orbitAngle),
-    distance * Math.sin(orbitAngle),
-    0
-  )
-  scene.add(planet)
+  // load a texture, set wrap mode to repeat
+  const texture = new THREE.TextureLoader().load(texturePath)
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  texture.repeat.set(4, 4)
 
   function rgba(r, g, b, a) {
     return `rgb(${r}, ${g}, ${b}, ${a})`
@@ -113,31 +107,54 @@ function createPlanet(
   const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial)
   scene.add(orbitPath)
 
-  planet.animate = function (delta) {
-    const angle = speed * delta
-    planet.rotation.y += angle
-
-    planet.position.set(
-      distance * Math.cos(orbitAngle),
-      distance * Math.sin(orbitAngle),
-      0
-    )
-    orbitAngle += angle
-  }
-
   const loader = new GLTFLoader()
 
   // Optional: Provide a DRACOLoader instance to decode compressed mesh data
   const dracoLoader = new DRACOLoader()
   loader.setDRACOLoader(dracoLoader)
 
+  var dog = null
   // Load a glTF resource
   loader.load(
     // resource URL
     gltfPath,
     // called when the resource is loaded
     function (gltf) {
-      scene.add(gltf.scene)
+      dog = gltf.scene
+      dog.scale.set(scale, scale, scale)
+
+      dogsArray.push(dog)
+
+      dog.isRotating = true
+      scene.add(dog)
+
+      dog.name = "Dog"
+      // positionner sur l'anneau
+      dog.position.set(
+        distance * Math.cos(orbitAngle),
+        distance * Math.sin(orbitAngle),
+        0
+      )
+
+      dog.traverse((child) => {
+        // Vérifier si l'objet est un maillage (mesh)
+        if (child.isMesh) {
+          // Appliquer la texture au matériau de l'objet
+          child.material.map = texture
+        }
+      })
+
+      // Add rotation animation to the dog
+      dog.animate = function (delta) {
+        const angle = speed * delta // Calculate the rotation angle based on the speed and delta time
+        dog.rotation.y += angle // Apply the rotation
+
+        dog.position.set(
+          distance * Math.cos(orbitAngle),
+          distance * Math.sin(orbitAngle)
+        ) // Update the position in the circular orbit
+        orbitAngle += angle // Update the orbit angle
+      }
 
       gltf.animations // Array<THREE.AnimationClip>
       gltf.scene // THREE.Group
@@ -154,9 +171,6 @@ function createPlanet(
       console.log("An error happened")
     }
   )
-
-  planet.name = name
-  return planet
 }
 
 // Create OrbitControls and enable camera movement
@@ -173,83 +187,79 @@ window.addEventListener("resize", () => {
 
 const sun = createSun()
 
-function rgb(r, g, b) {
-  return `rgb(${r}, ${g}, ${b})`
-}
-
-const planets = [
-  createPlanet(
-    0.7,
+const dogs = [
+  createdog(
+    1, //Scale
     "textures/mercure.jpg",
     7,
     0.47,
     0,
-    "Mercure",
+    "Mercure", // Name
     "assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
-    1.8,
-    "textures/venus.jpg",
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
+    1,
+    "textures/earth.jpg",
     10,
     0.35,
     Math.PI / 4,
     "Venus",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(
-    1.9,
+    "/assets/dog/scene.gltf"
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createdog(
+    3,
     "textures/earth.jpg",
     13,
     0.29,
     Math.PI / 2,
     "Terre",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-  createPlanet(
-    1.1,
+    "/assets/balloon_dog/scene.gltf"
+  ), // dog 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createdog(
+    4,
     "textures/mars.jpg",
     20,
     0.24,
     Math.PI / 6,
     "Mars",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
-    15,
+    "/assets/dog_skate/scene.gltf"
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
+    5,
     "textures/jupiter.jpg",
     42,
     0.13,
     Math.PI / 9,
     "Jupiter",
     "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
-  createPlanet(
-    11,
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+  createdog(
+    6,
     "textures/saturn.jpg",
     69,
     0.09,
     Math.PI,
     "Saturne",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
-  createPlanet(
-    7.5,
+    "/assets/dog/scene.gltf"
+  ), // dog 3: Radius: 0.9, Color: Blue, Distance: 9, Speed: 0.01
+  createdog(
+    15,
     "textures/uranus.jpg",
     127,
     0.06,
     (3 * Math.PI) / 4,
     "Uranus",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
-  createPlanet(
-    7.5,
-    "textures/neptune.jpg",
+    "/assets/dog/scene.gltf"
+  ), // dog 1: Radius: 0.5, Color: Red, Distance: 5, Speed: 0.02
+  createdog(
+    30,
+    "/assets/zombie_dog/textures/M_Wasteland_hound_normal.jpeg",
     256,
     0.05,
     (5 * Math.PI) / 6,
     "Neptune",
-    "/assets/bond_forger_from_spy__family/scene.gltf"
-  ), // Planet 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
+    "/assets/dog/scene.gltf"
+  ), // dog 2: Radius: 0.7, Color: Green, Distance: 7, Speed: 0.015
 ]
 
 const clock = new THREE.Clock() //
@@ -261,6 +271,19 @@ const mouse = new THREE.Vector2()
 // Eventlistener (onClick)
 canvas.addEventListener("click", onClick)
 
+let isDragging = false // Track dragging state
+
+function onMouseDown(event) {
+  isDragging = false
+}
+
+function onMouseMove(event) {
+  isDragging = true
+}
+
+canvas.addEventListener("mousedown", onMouseDown, false)
+canvas.addEventListener("mousemove", onMouseMove, false)
+
 function onClick(event) {
   const rect = canvas.getBoundingClientRect()
   const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
@@ -270,20 +293,71 @@ function onClick(event) {
 
   raycaster.setFromCamera(mouse, camera)
 
-  const intersects = raycaster.intersectObjects(planets, true)
+  const intersects = raycaster.intersectObjects(dogsArray, true)
 
+  if (isDragging) {
+    return // Ignore the click event if dragging occurred
+  }
+
+  // Get the text container element
+  const textContainer = document.getElementById("text-container")
+
+  // Clear previous text content
+  textContainer.innerHTML = ""
+
+  // Declare a flag to track the zoom state
   if (intersects.length > 0) {
     const object = intersects[0].object
-    console.log(`Planete touchée : ${object.name}`)
+    console.log(`dog clicked: ${object.name}`)
+
+    // Display dog information
+    const dogInfo = document.createElement("p")
+    dogInfo.textContent = `dog: ${object.name}`
+    dogInfo.textContent = `LA GROSSE DARONNE A HUGO PROUT PROUT PROUT`
+    textContainer.appendChild(dogInfo)
 
     // Zoom
+    const targetPosition = object.position.clone()
+    const distanceFromdog = object.geometry.parameters.radius * 4
+    const cameraPosition = targetPosition
+      .clone()
+      .add(new THREE.Vector3(0, 0, distanceFromdog))
+    const tweenDuration = 1000
 
-    console.log(object)
-    //camera.position.set(object.position)
+    new TWEEN.Tween(camera.position)
+      .to(cameraPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
 
-    // modifier le centre de ma scene
-    // au clique centre de gravité change soit centre de gravité se refresh soit arreter les planetes
-    // lerp / gsap
+    new TWEEN.Tween(camera.lookAt)
+      .to(targetPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
+
+    // Stop rotation
+    dogsArray.forEach((dog) => {
+      dog.isRotating = false
+    })
+  } else {
+    // Unzoom
+    const zoomOutPosition = new THREE.Vector3(0, 0, 200) // Adjust the unzoomed camera position
+    const tweenDuration = 1000
+
+    new TWEEN.Tween(camera.position)
+      .to(zoomOutPosition, tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onComplete(() => {
+        // Make dogsArray rotate again
+        dogsArray.forEach((dog) => {
+          dog.isRotating = true
+        })
+      })
+      .start()
+
+    new TWEEN.Tween(camera.lookAt)
+      .to(new THREE.Vector3(0, 0, 0), tweenDuration)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start()
   }
 }
 
@@ -292,11 +366,20 @@ function animate() {
 
   const delta = clock.getDelta() // Get the time difference since the last frame
 
-  // Animate each planet
-  planets.forEach((planet) => {
-    planet.animate(delta)
-  })
   // scene.children[numeroDeLenfant]
+
+  const dog = scene.children[20009]
+  if (dog) {
+    dog.rotation.y += 0.1
+  }
+
+  dogsArray.forEach((dog) => {
+    if (dog.isRotating) {
+      dog.animate(delta)
+    }
+  })
+
+  TWEEN.update()
 
   renderer.render(scene, camera)
 }

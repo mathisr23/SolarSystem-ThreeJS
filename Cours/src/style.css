@@ -25,4 +25,13 @@
     color: white;
     font-family: 'Astronova', Arial, sans-serif;
   }
+
+#text-container{
+    position: absolute;
+    top: 30%;
+    left: 5%;
+    color: white;
+    font-size: 32px;
+
+}
   
